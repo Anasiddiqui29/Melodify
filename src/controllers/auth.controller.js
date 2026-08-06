@@ -1,0 +1,102 @@
+const userModel = require('../models/user.model');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+async function registerUser(req , res){
+
+    const {username , email , password , role='user'} = req.body;
+
+    const isUserAlreadyExist = await users.findOne({
+        $or: [
+            {username},
+            {email}
+        ]
+    });
+
+    if(isUserAlreadyExist)
+    {
+        return res.status(401).json({
+            message: "User already exist"
+        });
+    }
+
+    const hashedPassword = await bcrpt.hash(password,10);
+
+    const user = await userModel.create({
+        username ,
+        email,
+        password: hashedPassword,
+        role
+    })
+
+    // now creating token
+    // point to note: We need to create token with atleast one unique atribute so here id is unique
+    const token = jwt.sign({
+        id: user._id,
+        role: user.role
+    },process.env.JWT_SECRET)
+
+    res.cookie("token" , token);
+
+    res.status(201).json({
+        message:"User created successfully",
+        user: {
+            id: user._id,
+            username : user.username,
+            email: user.email,
+            role: user.role
+        }
+    })
+
+    //Reversibility: Encryption can be reversed back to original text using a key, 
+    // but hashing is permanent and cannot be turned back into the original input.
+
+}
+
+async function login(req , res){
+
+    const {username , email , password} = req.body;
+
+    const user = await userModel.findOne({
+        $or: [
+            {username},
+            {email}
+        ]
+    })
+
+    if(!user)
+    {
+        return res.status(401).json({
+            message: "Invalid Credentials"
+        });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password , user.password)
+
+    if(!isPasswordValid)
+    {
+        return res.status(401).json({
+            message: "Invalid Credentials"
+        })
+    }
+
+    const token = jwt.sign({
+        id: user._id,
+        role: user.role
+    },process.env.JWT_SECRET)
+
+    res.cookie("token" , token);
+
+    res.status(201).json({
+        message:"User created successfully",
+        user: {
+            id: user._id,
+            username : user.username,
+            email: user.email,
+            role: user.role
+        }
+    })
+
+}
+
+module.exports = { registerUser , login };
