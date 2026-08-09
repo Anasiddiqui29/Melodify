@@ -6,7 +6,7 @@ async function registerUser(req , res){
 
     const {username , email , password , role='user'} = req.body;
 
-    const isUserAlreadyExist = await users.findOne({
+    const isUserAlreadyExist = await userModel.findOne({
         $or: [
             {username},
             {email}
@@ -20,7 +20,7 @@ async function registerUser(req , res){
         });
     }
 
-    const hashedPassword = await bcrpt.hash(password,10);
+    const hashedPassword = await bcrypt.hash(password,10);
 
     const user = await userModel.create({
         username ,
