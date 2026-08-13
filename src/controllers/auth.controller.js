@@ -88,7 +88,7 @@ async function login(req , res){
     res.cookie("token" , token);
 
     res.status(201).json({
-        message:"User created successfully",
+        message:"Logged in successfully",
         user: {
             id: user._id,
             username : user.username,
@@ -99,4 +99,13 @@ async function login(req , res){
 
 }
 
-module.exports = { registerUser , login };
+async function logout(req ,res){
+    
+    res.clearCookies("token");
+    
+    return res.status(200).json({
+        message: "Logged out successfully"
+    })
+}
+
+module.exports = { registerUser , login , logout};

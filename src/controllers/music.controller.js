@@ -15,7 +15,7 @@ async function createMusic(req, res) {
     const music = await musicModel.create({
         uri: result.url , 
         title,
-        artist: decoded.id,
+        artist: req.user.id,
     })
 
     res.status(201).json({
@@ -36,7 +36,7 @@ async function createAlbum(req, res){
 
     const album = await albumModel.create({ 
         title,
-        artist: decoded.id,
+        artist: req.user.id,
         music: musicIds,
     })
 
@@ -52,4 +52,41 @@ async function createAlbum(req, res){
 
 }
 
-module.exports = { createMusic , createAlbum };
+async function getAllMusics(req,res){
+    // find all the musics
+    // now if we want to return all the details of the artist then we can use populate method
+    const musics = await musicModel
+    .find()
+    .limit(2)
+    .populate("artist" , "username email");
+
+    return res.json({
+        message: "Music fetched successfully",
+        music: music,
+    })
+}
+
+async function getAllAlbums(req,res){
+
+    const albums = await musicModel.find().select("title artist").populate("artist" , "username email");
+
+    return res.json({
+        message: "Albums fetched successfully",
+        album: albums,
+    })
+}
+
+async function getAlbumById(req,res){
+    
+    const albumId = req.params.albumId;
+
+    const album = await albumModel.findById(albumId).populate("artist" , "username email");
+
+    return res.status(200).json({
+        message: "Album fetched successfully",
+        album: album
+    })
+
+}
+
+module.exports = { createMusic , createAlbum , getAllMusics , getAllAlbums , getAlbumById};

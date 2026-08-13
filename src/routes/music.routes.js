@@ -14,4 +14,9 @@ router.post("/upload" ,authMiddleware.authArtist ,upload.single("music") ,musicC
 
 router.post("/album" , authMiddleware.authArtist ,musicController.createAlbum)
 
+// now creating get api
+router.get("/" ,authMiddleware.authUser ,musicController.getAllMusics)
+router.get("/getAlbum" , authMiddleware.authUser , musicController.getAllAlbums)
+router.get("/getAlbum/:albumId" , authMiddleware.authUser , musicController.getAlbumById)
+
 module.exports = router;
