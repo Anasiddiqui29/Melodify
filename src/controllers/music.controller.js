@@ -57,12 +57,12 @@ async function getAllMusics(req,res){
     // now if we want to return all the details of the artist then we can use populate method
     const musics = await musicModel
     .find()
-    .limit(2)
+    .limit(10)
     .populate("artist" , "username email");
 
     return res.json({
         message: "Music fetched successfully",
-        music: music,
+        music: musics,
     })
 }
 
