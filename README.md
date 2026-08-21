@@ -16,10 +16,3 @@ Notes and next steps:
 - Fixed auth route and logout bug to match controller exports
 - The frontend is a minimal modern UI (React + TypeScript + Tailwind). It includes pages for Home, Login, Register, Album and Upload and a simple API client (src/api.ts)
 
-If you'd like, I can:
-- Add prettier / ESLint configs
-- Implement auth state persistence (context or Redux)
-- Build a richer music player UI with queueing and waveform visualization
-- Hook up album cover upload and better error handling
-
-Run or tell me which of the above to implement next.
