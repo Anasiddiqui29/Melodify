@@ -24,7 +24,29 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user' , 'artist'],
         default: 'user',
+    },
+
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    emailVerificationToken: {
+        type: String
+    },
+
+    emailVerificationExpires: {
+        type: Date
+    },
+
+    passwordResetToken: {
+        type: String
+    },
+
+    passwordResetExpires: {
+        type: Date
     }
+
 })
 
 const userModel = mongoose.model("user" , userSchema);

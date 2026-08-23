@@ -1,6 +1,8 @@
 const userModel = require('../models/user.model');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const {sendEmail} = require("../services/email.service")
 
 async function registerUser(req , res){
 
@@ -31,22 +33,50 @@ async function registerUser(req , res){
 
     // now creating token
     // point to note: We need to create token with atleast one unique atribute so here id is unique
-    const token = jwt.sign({
-        id: user._id,
-        role: user.role
-    },process.env.JWT_SECRET)
+    // const token = jwt.sign({
+    //     id: user._id,
+    //     role: user.role
+    // },process.env.JWT_SECRET)
+    
+    // We will be generating email verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex")
 
-    res.cookie("token" , token);
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpires = Date.now() + 30 * 60 * 1000;
+
+    await user.save();
+
+    // verification link
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+
+    // Sending verification email
+    await sendEmail(
+        user.email,
+        "Verify your Spotify Clone account",
+        `
+            <h2>Welcome to Spotify Clone 🎵</h2>
+
+            <p>Please verify your email address to activate your account.</p>
+
+            <a href="${verificationLink}">
+                Verify Email
+            </a>
+
+            <p>This link will expire in 30 minutes.</p>
+        `
+    );
+
+    // res.cookie("token" , token);
 
     res.status(201).json({
-        message:"User created successfully",
+        message:"User created successfully. Please verify your email.",
         user: {
             id: user._id,
             username : user.username,
             email: user.email,
             role: user.role
         }
-    })
+    });
 
     //Reversibility: Encryption can be reversed back to original text using a key, 
     // but hashing is permanent and cannot be turned back into the original input.
@@ -99,6 +129,36 @@ async function login(req , res){
 
 }
 
+async function verifyEmail(req,res){
+    // first verify the token and if verified then set verifyEmail to true
+
+    const {token} = req.params;
+
+    const user = await userModel.findOne({
+        emailVerificationToken: token,
+        emailVerificationExpires: {
+            $gt : Date.now()
+        }
+    });
+
+    if(!user){
+        return res.status(400).json({
+            message: "Invalid or expired Validation token"
+        })
+    }
+
+    user.emailVerified = true;
+    user.emailVerificationExpires = undefined 
+    user.emailVerificationToken = undefined
+
+    await user.save()
+
+    return res.status(200).json({
+        message: "Email verified successfully"
+    });
+
+}
+
 async function logout(req ,res){
     
     res.clearCookie("token");
@@ -108,4 +168,4 @@ async function logout(req ,res){
     })
 }
 
-module.exports = { registerUser , login , logout};
+module.exports = { registerUser , login , logout , verifyEmail };

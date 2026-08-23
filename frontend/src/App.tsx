@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import VerifyEmail from "./pages/VerifyEmail";
 import Album from './pages/Album'
 import Upload from './pages/Upload'
 import Navbar from './components/Navbar'
@@ -69,6 +70,11 @@ export default function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/register" element={<Register />} />
+
+      <Route
+        path="/verify-email/:token"
+        element={<VerifyEmail />}
+      />
 
 
       {/* =========================
