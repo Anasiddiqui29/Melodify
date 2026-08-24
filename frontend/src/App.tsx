@@ -5,6 +5,8 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Album from './pages/Album'
 import Upload from './pages/Upload'
 import Navbar from './components/Navbar'
@@ -76,6 +78,15 @@ export default function App() {
         element={<VerifyEmail />}
       />
 
+      <Route 
+        path="/forgot-password"
+        element = {<ForgotPassword />}
+      />
+
+      <Route 
+        path="/reset-password/:token"
+        element = {<ResetPassword />}
+      />
 
       {/* =========================
           APPLICATION LAYOUT

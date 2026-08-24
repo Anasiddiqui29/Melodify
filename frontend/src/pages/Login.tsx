@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -142,12 +143,14 @@ export default function Login() {
                   Password
                 </label>
 
-                <button
-                  type="button"
-                  className="text-xs text-[#C9A962] hover:text-[#E4C989] transition-colors focus-visible:outline-none focus-visible:underline"
-                >
-                  Forgot password?
-                </button>
+                
+              <Link
+                    to="/forgot-password"
+                    className="text-sm text-green-600 hover:underline"
+              >
+                    Forgot Password?
+              </Link>
+            
               </div>
 
               <div className="relative">

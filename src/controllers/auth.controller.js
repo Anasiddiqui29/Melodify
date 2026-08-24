@@ -30,13 +30,6 @@ async function registerUser(req , res){
         password: hashedPassword,
         role
     })
-
-    // now creating token
-    // point to note: We need to create token with atleast one unique atribute so here id is unique
-    // const token = jwt.sign({
-    //     id: user._id,
-    //     role: user.role
-    // },process.env.JWT_SECRET)
     
     // We will be generating email verification token
     const verificationToken = crypto.randomBytes(32).toString("hex")
@@ -65,8 +58,6 @@ async function registerUser(req , res){
             <p>This link will expire in 30 minutes.</p>
         `
     );
-
-    // res.cookie("token" , token);
 
     res.status(201).json({
         message:"User created successfully. Please verify your email.",
@@ -159,6 +150,98 @@ async function verifyEmail(req,res){
 
 }
 
+async function forgotPassword(req,res) {
+
+    const {email} = req.body
+
+    const user = await userModel.findOne({email});
+
+    if(!user)
+    {
+        return res.status(401).json({
+            message: "User not found"
+        })
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.passwordResetToken = resetToken;
+
+    user.passwordResetExpires = new Date(Date.now() + 15*60*1000) ;
+    
+    await user.save()
+
+    const resetLink = 
+        `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    await sendEmail(
+        user.email ,
+
+        "Reset your Spotify Clone password",
+        `
+            <h2>Password Reset</h2>
+
+            <p>You requested to reset your password.</p>
+
+            <p>Click the button below to reset it:</p>
+
+            <a href="${resetLink}">
+                Reset Password
+            </a>
+
+            <p>This link will expire in 15 minutes.</p>
+
+            <p>
+                If you did not request this, you can safely ignore this email.
+            </p>
+        `
+    )
+
+    return res.status(200).json({
+        message : "Please check your email box"
+    });
+
+}
+
+async function resetPassword(req,res){
+
+    const {token} = req.params; 
+    const {password} = req.body;
+
+    if(!password){
+        return res.status(400).json({
+            message: "Password is required"
+        });
+    }
+
+    const user = await userModel.findOne({
+        passwordResetToken : token ,
+        passwordResetExpires : {
+            $gt : Date.now()
+        } 
+    });
+
+    if(!user){
+        return res.status(400).json({
+            message: "Invalid or expired password reset token"
+        });
+    }
+
+    const hashedPassword = await bcrypt.hash(password , 10);
+
+    user.password = hashedPassword;
+
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+        message: "Password reset successfully"
+    });
+
+}
+
 async function logout(req ,res){
     
     res.clearCookie("token");
@@ -168,4 +251,4 @@ async function logout(req ,res){
     })
 }
 
-module.exports = { registerUser , login , logout , verifyEmail };
+module.exports = { registerUser , login , logout , verifyEmail , forgotPassword , resetPassword};
