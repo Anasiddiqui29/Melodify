@@ -32,23 +32,42 @@ async function createMusic(req, res) {
 
 async function createAlbum(req, res){
     
-    const {title , musicIds} = req.body;
+    const {title , musicIds , coverImage} = req.body;
+
+    const musics = await musicModel.find({
+        _id: {$in : musicIds},
+        artist: req.user.id
+    })
+
+    if(musics.length !== musicIds.length){
+        return res.status(400).json({
+            message: "One or more songs donot belong to you"
+        });
+    }
+
 
     const album = await albumModel.create({ 
         title,
+        coverImage,
         artist: req.user.id,
-        music: musicIds,
+        music: musicIds
     })
 
+    await musicModel.updateMany(
+        { _id: { $in: musicIds } },
+        { $set: { album: album._id } }
+    )
+
     res.status(201).json({
-        message: "Music created successfully",
+        message: "Album created successfully",
         music: {
             title: album.title,
             id: album.id , 
             music: album.music,
             artist: album.artist,
+            coverImage: album.coverImage
         }
-    })
+    });
 
 }
 
@@ -68,11 +87,13 @@ async function getAllMusics(req,res){
 
 async function getAllAlbums(req,res){
 
-    const albums = await musicModel.find().select("title artist").populate("artist" , "username email");
+    const albums = await albumModel
+    .find()
+    .populate("artist" , "username email");
 
     return res.json({
         message: "Albums fetched successfully",
-        album: albums,
+        albums: albums,
     })
 }
 
@@ -80,7 +101,22 @@ async function getAlbumById(req,res){
     
     const albumId = req.params.albumId;
 
-    const album = await albumModel.findById(albumId).populate("artist" , "username email");
+    const album = await albumModel
+    .findById(albumId)
+    .populate("artist" , "username email")
+    .populate({
+            path: "music",
+            populate: {
+                path: "artist",
+                select: "username email"
+            }
+    });
+
+    if(!album){
+        return res.status(404).json({
+            message: "Album not found"
+        });
+    }
 
     return res.status(200).json({
         message: "Album fetched successfully",

@@ -13,7 +13,11 @@ const albumSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
         required: true,
-    }
+    },
+    coverImage: {
+        type: String ,
+        required: true
+    },
 })
 
 const albumModel = mongoose.model("album" , albumSchema);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import api from '../api'
 import MusicCard from '../components/MusicCard'
 import { useAuth } from '../context/AuthContext'
@@ -7,12 +8,29 @@ export default function Home() {
   const { user } = useAuth()
   const [musics, setMusics] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [albums , setAlbums] = useState<any[]>([])
+  const [albumLoading , setAlbumLoading] = useState(true)
 
   useEffect(() => {
     api.get('/music')
       .then(r => setMusics(r.data.music || []))
       .catch(() => {})
       .finally(() => setLoading(false))
+
+    api.get('/music/getAlbum')
+      .then(r => setAlbums(r.data.albums || []))
+      .catch(() => {})
+      .finally(() => setAlbumLoading(false))
+  //   api.get('/music/getAlbum')
+  // .then(r => {
+  //   console.log("ALBUM API RESPONSE:", r.data)
+  //   setAlbums(r.data.albums || [])
+  // })
+  // .catch(error => {
+  //   console.error("ALBUM FETCH ERROR:", error)
+  // })
+  // .finally(() => setAlbumLoading(false))
+    
   }, [])
 
   return (
@@ -39,6 +57,99 @@ export default function Home() {
             ? 'Here\u2019s what\u2019s playing across the catalog.'
             : 'Fresh tracks, picked for tonight.'}
         </p>
+      </div>
+    
+    {/* Albums */}
+    <div className="mb-12">
+
+    <div className="flex items-baseline justify-between mb-5 pb-3 border-b border-[#3A362E]">
+
+      <h2
+        className="text-xl text-[#F3EFE7]"
+        style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
+      >
+        Albums
+      </h2>
+
+      {!albumLoading && (
+        <span
+          className="text-xs text-[#6B6660] tracking-wide"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          {albums.length} {albums.length === 1 ? 'ALBUM' : 'ALBUMS'}
+        </span>
+      )}
+
+    </div>
+
+
+    {/* Loading */}
+
+    {albumLoading && (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="aspect-square rounded-xl bg-[#131218] border border-[#3A362E] animate-pulse"
+          />
+        ))}
+
+      </div>
+    )}
+
+
+      {/* Albums */}
+
+      {!albumLoading && albums.length > 0 && (
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+
+          {albums.map((album) => (
+
+            <Link
+              key={album._id}
+              to={`/album/${album._id}`}
+              className="group"
+            >
+
+              <div className="aspect-square rounded-xl overflow-hidden bg-[#15151C] border border-[#3A362E]">
+
+                {album.coverImage ? (
+
+                  <img
+                    src={album.coverImage}
+                    alt={album.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+
+                ) : (
+
+                  <div className="w-full h-full flex items-center justify-center text-5xl">
+                    🎵
+                  </div>
+
+                )}
+
+              </div>
+
+
+              <h3 className="mt-3 text-[#F3EFE7] font-medium truncate">
+                {album.title}
+              </h3>
+
+              <p className="text-sm text-[#6B6660] mt-1 truncate">
+                {album.artist?.username || 'Unknown Artist'}
+              </p>
+
+            </Link>
+
+          ))}
+
+        </div>
+
+      )}
+
       </div>
 
       {/* Section header */}

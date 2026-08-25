@@ -50,12 +50,12 @@ async function authUser(req,res,next){
 
         req.user = decoded ;
 
-        if(decoded.role !== "user")
-            {
-                return res.status(403).json({
-                    message: "You dont have access to the music."
-                })
-            }
+        // if(decoded.role !== "user")
+        //     {
+        //         return res.status(403).json({
+        //             message: "You dont have access to the music."
+        //         })
+        //     }
 
         next()
 
