@@ -43,7 +43,7 @@ export default function Register() {
             className="text-[11px] font-medium tracking-[0.25em] text-[#C9A962] mb-4"
             style={{ fontFamily: "'IBM Plex Mono', monospace" }}
           >
-            SPOTIFY CLONE
+            MELODIFY
           </p>
 
           <h1

@@ -45,9 +45,9 @@ async function registerUser(req , res){
     // Sending verification email
     await sendEmail(
         user.email,
-        "Verify your Spotify Clone account",
+        "Verify your Melodify account",
         `
-            <h2>Welcome to Spotify Clone 🎵</h2>
+            <h2>Welcome to Melodify 🎵</h2>
 
             <p>Please verify your email address to activate your account.</p>
 
@@ -177,7 +177,7 @@ async function forgotPassword(req,res) {
     await sendEmail(
         user.email ,
 
-        "Reset your Spotify Clone password",
+        "Reset your Melodify password",
         `
             <h2>Password Reset</h2>
 

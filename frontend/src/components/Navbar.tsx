@@ -37,7 +37,7 @@ export default function Navbar() {
             className="text-xl text-[#F3EFE7] tracking-tight group-hover:text-[#E4C989] transition-colors"
             style={{ fontFamily: "'Fraunces', serif", fontWeight: 500 }}
           >
-            Spotify Clone
+            Melodify
           </span>
         </Link>
 

@@ -21,15 +21,6 @@ export default function Home() {
       .then(r => setAlbums(r.data.albums || []))
       .catch(() => {})
       .finally(() => setAlbumLoading(false))
-  //   api.get('/music/getAlbum')
-  // .then(r => {
-  //   console.log("ALBUM API RESPONSE:", r.data)
-  //   setAlbums(r.data.albums || [])
-  // })
-  // .catch(error => {
-  //   console.error("ALBUM FETCH ERROR:", error)
-  // })
-  // .finally(() => setAlbumLoading(false))
     
   }, [])
 
