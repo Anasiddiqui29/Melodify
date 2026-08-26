@@ -1,4 +1,5 @@
 import React from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
@@ -6,6 +7,7 @@ export default function Navbar() {
 
   const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
+  const [searchQuery , setSearchQuery] = useState("");
 
   const handleLogout = () => {
     logout()
@@ -38,6 +40,33 @@ export default function Navbar() {
             Spotify Clone
           </span>
         </Link>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+
+            if(!searchQuery.trim()) {
+              return 
+            }
+
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+
+          }}
+          className="flex-1 max-w-md"
+        >
+
+          <input
+            type='text'
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+            }}
+            placeholder="Search songs, albums, artists..."
+            className="w-full bg-[#131218] border border-[#3A362E] rounded-xl px-4 py-2.5 text-sm text-[#F3EFE7] placeholder-[#6B6660] outline-none focus:border-[#C9A962] transition"
+          />
+
+        </form>
+
 
         <nav className="flex items-center space-x-2">
           {!isAuthenticated ? (

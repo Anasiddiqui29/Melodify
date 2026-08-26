@@ -4,6 +4,7 @@ const { uploadFile } = require("../services/storage.service");
 // ok so since album doesnot have a major role so we will fit its logic in this controller 
 // rather than creating seperate routes and logic files
 const albumModel = require("../models/album.model")
+const userModel = require("../models/user.model")
 
 async function createMusic(req, res) {
 
@@ -125,4 +126,58 @@ async function getAlbumById(req,res){
 
 }
 
-module.exports = { createMusic , createAlbum , getAllMusics , getAllAlbums , getAlbumById};
+async function searchMusic(req,res){
+
+    const {q} = req.query ;
+
+    console.log("SEARCH QUERY:", q);
+
+    if(!q || q.trim() === ""){
+        return res.status(400).json({
+            message: "Search query is requried"
+        })
+    }
+
+    const searchQuery = q.trim() ;
+
+    const songs = await musicModel
+        .find({
+            title: {
+                $regex: searchQuery,
+                $options: "i"
+            }
+        })
+        .populate("artist", "username email")
+        .populate("album", "title coverImage");
+
+    const albums = await albumModel
+        .find({
+            title: {
+                $regex: searchQuery,
+                $options: "i"
+            }
+        })
+        .populate("artist", "username email");
+
+    const artists = await userModel
+        .find({
+            username: {
+                $regex: searchQuery,
+                $options: "i"
+            }
+        })
+        .select("username email role")
+    
+    return res.status(200).json({
+        message: "Search results fetched successfully",
+        results: {
+            songs,
+            albums,
+            artists
+        }
+    });
+    
+
+}
+
+module.exports = { createMusic , createAlbum , getAllMusics , getAllAlbums , getAlbumById , searchMusic};

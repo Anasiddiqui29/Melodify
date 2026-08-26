@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Search from "./pages/Search";
 import Album from './pages/Album'
 import Upload from './pages/Upload'
 import Navbar from './components/Navbar'
@@ -127,6 +128,15 @@ export default function App() {
 
       </Route>
 
+      <Route 
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <Search />
+          </ProtectedRoute>
+        }
+       />
+      
 
       {/* =========================
           FALLBACK
