@@ -101,6 +101,12 @@ async function login(req , res){
         })
     }
 
+    if(!user.emailVerified){
+        return res.status(403).json({
+            message: "Please verify your email"
+        })
+    }
+
     const token = jwt.sign({
         id: user._id,
         role: user.role
